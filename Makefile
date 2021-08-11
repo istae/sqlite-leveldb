@@ -1,3 +1,5 @@
 clean:
-	rm sqlite.db
-	rm -rf leveldb.db
+	rm -rf db
+
+binary:
+	go build -o dist/db

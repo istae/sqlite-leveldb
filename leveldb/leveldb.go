@@ -2,18 +2,12 @@ package leveldb
 
 import (
 	"encoding/binary"
-	"errors"
 
 	"github.com/syndtr/goleveldb/leveldb"
 )
 
-type Uint64Field struct {
-	DB  *leveldb.DB
-	Key []byte
-}
-
-func New() *leveldb.DB {
-	ldb, err := leveldb.OpenFile("leveldb.db", nil)
+func New(path string) *leveldb.DB {
+	ldb, err := leveldb.OpenFile(path, nil)
 	if err != nil {
 		panic(err)
 	}
@@ -21,19 +15,16 @@ func New() *leveldb.DB {
 	return ldb
 }
 
-func (f Uint64Field) Put(val uint64) (err error) {
-	return f.DB.Put(f.Key, encodeUint64(val), nil)
+func Put(db *leveldb.DB, key, val []byte) (err error) {
+	return db.Put(key, val, nil)
 }
 
-func (f Uint64Field) Get() (val uint64, err error) {
-	b, err := f.DB.Get(f.Key, nil)
+func Get(db *leveldb.DB, key []byte) ([]byte, error) {
+	val, err := db.Get(key, nil)
 	if err != nil {
-		if errors.Is(err, leveldb.ErrNotFound) {
-			return 0, nil
-		}
-		return 0, err
+		return nil, err
 	}
-	return binary.BigEndian.Uint64(b), nil
+	return val, nil
 }
 
 func encodeUint64(val uint64) (b []byte) {
